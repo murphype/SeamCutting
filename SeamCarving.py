@@ -9,7 +9,7 @@ def get_energy_matrix(image):
     
     width, height = image.size
 
-    energy_matrix = np.zeros(image.size)
+    energy_matrix = np.zeros((height, width))
 
     for i in range(width):
         for j in range(height):
@@ -21,7 +21,7 @@ def get_energy_matrix(image):
 
 def energyFunction (e, x, y, width, height):
     if(x ==0 or y ==0 or x == width-1 or y == height - 1):
-        e[x][y] = 1000
+        e[y][x] = 1000
     else:
         up = image.getpixel((x,y-1))
         down = image.getpixel((x,y+1))
@@ -29,7 +29,7 @@ def energyFunction (e, x, y, width, height):
         right = image.getpixel((x+1,y))
         deltaYSquare = ((up[0]-down[0])**2) + ((up[1]-down[1])**2) + ((up[2]-down[2])**2)
         deltaXSquare = ((left[0]-right[0])**2) + ((left[1]-right[1])**2) + ((left[2]-right[2])**2)
-        e[x][y] = math.sqrt(deltaXSquare + deltaYSquare)
+        e[y][x] = math.sqrt(deltaXSquare + deltaYSquare)
 
 
 
