@@ -124,9 +124,6 @@ def get_seam(solution_matrix, path_matrix):
             min_value_index = i
 
     col = min_value_index
-    print("column")
-    print(col)
-    print()
     seam = []
 
     while (row < rows):
@@ -152,32 +149,54 @@ if __name__ == "__main__":
 
     filename = "InitialImage-1.jpg"
     image = Image.open(filename)
+    image.show()
+    for i in range(50):
+        print("iteration:", i)
 
-    energy_matrix = get_energy_matrix(image)
+        energy_matrix = get_energy_matrix(image)
 
-    print(energy_matrix[300][200])
-    print(energy_matrix[0][200])
-
-
-    # test_energy_matrix = np.array([[8,3,4],
-    #                             [2,10,1],
-    #                             [9,2,5]])
-
-    # print(test_energy_matrix)
-
-    solution_matrix, path_matrix = auxillary_matrices(energy_matrix)
+        # print(energy_matrix[100][200])
+        # print(energy_matrix[0][200])
 
 
-    print()
-    print(solution_matrix)
-    print()
-    print(path_matrix)
+        # test_energy_matrix = np.array([[8,3,4],
+        #                             [2,10,1],
+        #                             [9,2,5]])
 
+        # print(test_energy_matrix)
 
-    seam = get_seam(solution_matrix, path_matrix)
+        solution_matrix, path_matrix = auxillary_matrices(energy_matrix)
 
 
 
+        seam = get_seam(solution_matrix, path_matrix)
 
-    print()
-    print(seam)
+
+
+        img = np.array(image).astype(int)
+        
+        
+
+        # deleting seam
+
+        mask = np.ones(img.shape, dtype=bool)
+
+        for point in seam:
+            mask[point[0],point[1], :] = False
+
+
+        # print(img[mask].shape)
+ 
+        img = img[mask].reshape(img.shape[0], img.shape[1]-1, 3)
+        print(img.shape)
+        
+        image = Image.fromarray(img.astype(np.uint8), mode = "RGB")
+
+
+    
+    image.show()
+
+        
+            
+
+
