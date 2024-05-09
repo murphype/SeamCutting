@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw
 import numpy as np
 import math
+import pandas as pd
 
 
 #CONSTANTS
@@ -219,16 +220,28 @@ def seam_carve(image, desired_width):
 
     # for loop to delete one seam at a time
     for i in range(iter):
-        print("iteration:", i)
+        print("iteration:", i+1)
+
 
         #get energy matrix
         energy_matrix = get_energy_matrix(image)
+        if (i == 0):
+            # save initial energy matrix
+            df = pd.DataFrame(data = energy_matrix[1:-1,1:-1])
+            df.to_csv('./energy.csv', sep=',', header=False, index=False)
+
 
         # get solution_matrix and path_matrix
         solution_matrix, path_matrix = auxillary_matrices(energy_matrix)
 
+
         # get the seam to delete
         seam = get_seam(solution_matrix, path_matrix)
+        if (i == 0):
+            # save first seam
+            df = pd.DataFrame(data = seam)
+            df.to_csv('./seam1.csv', sep=',', header=False, index=False)
+
 
         # update the image by deleting the seam
         image = delete_seam(image, seam)
