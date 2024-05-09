@@ -1,3 +1,9 @@
+# SeamCarving.py
+# CSC 301 Spring 2024
+# Authors: Timur Kasimov, Peter Murphy, Krishna Nayar
+# Date: May 9th, 2024
+
+
 from PIL import Image, ImageDraw
 import numpy as np
 import math
@@ -180,27 +186,26 @@ seam: a vector of coordinates representing the seam to be removed
 OUTPUTS
 image: the reduced image
 """
-def delete_seam(image, seam):
-    # transform the image object into a 3d array
-    img = np.array(image).astype(int)
-    
+def delete_seam(img, seam, energy_matrix):
 
     # create a boolean mask of the img matrix
     mask = np.ones(img.shape, dtype=bool)
+    mask1 = np.ones(energy_matrix.shape, dtype=bool)
 
     # for every pixel in the seam, set the correspoding mask's matrix to false
     for pixel in seam:
         mask[pixel[0],pixel[1], :] = False
+        mask1[pixel[0], pixel[1]] = False
 
 
     # reconstruct the img matrix by omitting the corresponding false values
     # using the mask matrix
     img = img[mask].reshape(img.shape[0], img.shape[1]-1, 3)
+    energy_matrix = energy_matrix[mask1].reshape(img.shape[0], img.shape[1])
     # print(img.shape)
     
-    # put the image object back together with the seam deleted
-    image1 = Image.fromarray(img.astype(np.uint8), mode = "RGB")
-    return image1
+
+    return img, energy_matrix
 
 
 
@@ -218,22 +223,23 @@ def seam_carve(image, desired_width):
     #define number of needed iterations
     iter = image.size[0] - desired_width
 
+    #get energy matrix
+    energy_matrix = get_energy_matrix(image)
+
+    # save initial energy matrix
+    df = pd.DataFrame(data = energy_matrix[1:-1,1:-1])
+    df.to_csv('./energy.csv', sep=',', header=False, index=False)
+
+
+    # transform the image object into a 3d array
+    img = np.array(image).astype(int)
+
     # for loop to delete one seam at a time
     for i in range(iter):
         print("iteration:", i+1)
 
-
-        #get energy matrix
-        energy_matrix = get_energy_matrix(image)
-        if (i == 0):
-            # save initial energy matrix
-            df = pd.DataFrame(data = energy_matrix[1:-1,1:-1])
-            df.to_csv('./energy.csv', sep=',', header=False, index=False)
-
-
         # get solution_matrix and path_matrix
         solution_matrix, path_matrix = auxillary_matrices(energy_matrix)
-
 
         # get the seam to delete
         seam = get_seam(solution_matrix, path_matrix)
@@ -242,12 +248,14 @@ def seam_carve(image, desired_width):
             df = pd.DataFrame(data = seam)
             df.to_csv('./seam1.csv', sep=',', header=False, index=False)
 
-
         # update the image by deleting the seam
-        image = delete_seam(image, seam)
+        img, energy_matrix = delete_seam(img, seam, energy_matrix)
+
+
+    # put the image object back together with the seam deleted
+    image = Image.fromarray(img.astype(np.uint8), mode = "RGB")
     
     return image
-
 
 
 """
@@ -257,8 +265,3 @@ if __name__ == "__main__":
     image = Image.open(FILENAME)
     image = seam_carve(image, DESIRED_WIDTH)
     image.save("FinalImage.jpg")
-
-        
-            
-
-
