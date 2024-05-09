@@ -248,7 +248,7 @@ def seam_carve(image, desired_width):
             df = pd.DataFrame(data = seam)
             df.to_csv('./seam1.csv', sep=',', header=False, index=False)
 
-        # update the image by deleting the seam
+        # update the image and energy matrix by deleting the seam
         img, energy_matrix = delete_seam(img, seam, energy_matrix)
 
 
